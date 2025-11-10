@@ -23,11 +23,11 @@
             <version>6.1.1</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.neo4j.gds/neo4j-kernel-adapter-aura -->
+        <!-- Neo4j API -->
         <dependency>
-            <groupId>org.neo4j.gds</groupId>
-            <artifactId>neo4j-kernel-adapter-aura</artifactId>
-            <version>1.6.0-alpha07</version>
+            <groupId>org.neo4j.driver</groupId>
+            <artifactId>neo4j-java-driver</artifactId>
+            <version>6.0.2</version>
         </dependency>
 
     </dependencies>
