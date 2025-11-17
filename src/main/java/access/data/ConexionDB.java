@@ -1,9 +1,7 @@
-package data;
+package access.data;
 
 import org.neo4j.driver.*;
-import secrets.Config;
-
-import java.time.Duration;
+import access.secrets.Config;
 
 /**
  * Neo4j connection facade.

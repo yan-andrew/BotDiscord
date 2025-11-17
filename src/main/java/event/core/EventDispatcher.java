@@ -1,11 +1,11 @@
 // File: events/core/EventDispatcher.java
-package eventscore;
+package event.core;
 
 import java.util.*;
 
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.events.GenericEvent;
-import events.EventHandler;
+import event.events.EventHandler;
 
 /**
  * Centralizes delivery of JDA events to registered handlers.

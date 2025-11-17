@@ -1,6 +1,6 @@
-package creational;
+package access.creational;
 
-import data.ConexionDB;
+import access.data.ConexionDB;
 
 public class ConexionDBSingleton {
     private static ConexionDB instance = new ConexionDB();

@@ -1,0 +1,9 @@
+[
+  {
+    "id": "channel.register",
+    "name": "channel-register",
+    "description": "Register the channels necessary for holding events.",
+    "aliases": ["modslogs-channel", "vcg-channel", "tickets-channel", "advertising-channel", "poll-channel"],
+    "enabled": true
+  }
+]

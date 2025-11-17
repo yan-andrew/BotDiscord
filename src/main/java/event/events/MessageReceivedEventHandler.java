@@ -1,5 +1,5 @@
 // File: events/handlers/MessageReceivedEventHandler.java
-package events;
+package event.events;
 
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;

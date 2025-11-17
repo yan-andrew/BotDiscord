@@ -1,17 +1,23 @@
 package BotApplication;
 
-import events.GuildJoinEventHandler;
-import events.MessageReceivedEventHandler;
-import eventscore.EventDispatcher;
+import command.builtin.*;
+import command.commands.*;
+import command.core.CommandMetadata;
+import command.core.CommandMetadataIndex;
+import command.meta.*;
+import event.events.*;
+import event.core.EventDispatcher;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.requests.GatewayIntent;
-import java.io.FileNotFoundException;
+import java.nio.file.Paths;
+import java.util.List;
 
-import secrets.Config;
-import creational.ConexionDBSingleton;
+import access.secrets.Config;
+import access.creational.ConexionDBSingleton;
 
 public class BotApplication {
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void main(String[] args) throws Exception {
         var cx = ConexionDBSingleton.getInstance();
         cx.connect();
 
@@ -26,10 +32,25 @@ public class BotApplication {
             System.exit(1);
         }
 
-        JDABuilder.createDefault(token)
+        JDA jda = JDABuilder.createDefault(token)
                 .enableIntents(GatewayIntent.GUILD_MESSAGES, GatewayIntent.MESSAGE_CONTENT, GatewayIntent.GUILD_MEMBERS)
                 .addEventListeners(dispatcher)
                 .build();
+
+        CommandMetadataProvider metaProvider =
+                new JsonCommandMetadataProvider(Paths.get("commands.json"));
+        List<CommandMetadata> metas = metaProvider.load();
+
+        CommandMetadataIndex metaIndex = new CommandMetadataIndex();
+        metaIndex.load(metas);
+
+        CommandRegistry registry = new CommandRegistry();
+        registry.register(new RegisterChannelCommand());
+
+        SlashPublisher publisher = new SlashPublisher();
+        publisher.publishAll(jda, metaIndex);
+
+        jda.addEventListener(new CommandRouter(registry, metaIndex));
 
         System.out.println("Discord bot is ready");
     }

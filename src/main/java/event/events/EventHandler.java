@@ -1,4 +1,4 @@
-package events;
+package event.events;
 
 import net.dv8tion.jda.api.events.GenericEvent;
 
