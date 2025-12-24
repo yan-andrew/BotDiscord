@@ -4,6 +4,35 @@
     "name": "channel-register",
     "description": "Register the channels necessary for holding events.",
     "aliases": ["modslogs-channel", "vcg-channel", "tickets-channel", "advertising-channel", "poll-channel"],
-    "enabled": true
+    "enabled": true,
+    "options": [
+      {
+        "name": "channel",
+        "description": "Channel where to perform the activity",
+        "type": "CHANNEL",
+        "required": true
+      }
+    ]
+  },
+  {
+    "id": "auto.response",
+    "name": "autoresponse",
+    "description": "Configure automatic reply messages.",
+    "aliases": ["add-response", "remove-response"],
+    "enabled": true,
+    "options": [
+      {
+        "name": "message",
+        "description": "Message to automatically reply to",
+        "type": "String",
+        "required": true
+      },
+      {
+        "name": "response",
+        "description": "Reply to message",
+        "type": "String",
+        "required": false
+      }
+    ]
   }
 ]

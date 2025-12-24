@@ -11,10 +11,10 @@ import org.neo4j.driver.Values;
  */
 public final class GuildJoinEventHandler implements EventHandler<GuildJoinEvent> {
     @Override
-    public void handleEvent(GuildJoinEvent event) {
+    public void handleEvent(GuildJoinEvent pEvent) {
         String cypher = "";
-        String name = event.getGuild().getName();
-        String id = event.getGuild().getId();
+        String name = pEvent.getGuild().getName();
+        String id = pEvent.getGuild().getId();
 
         var conexion = ConexionDBSingleton.getInstance();
 
@@ -30,7 +30,6 @@ public final class GuildJoinEventHandler implements EventHandler<GuildJoinEvent>
             } finally {
                 transaction.close();
             }
-
         }
     }
 

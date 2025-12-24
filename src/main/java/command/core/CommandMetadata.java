@@ -7,5 +7,6 @@ public record CommandMetadata(
         String name,
         String description,
         List<String> aliases,
-        boolean enabled
+        boolean enabled,
+        List<OptionMetadata> options
 ) { }

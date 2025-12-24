@@ -23,7 +23,9 @@ public class BotApplication {
 
         var dispatcher = new EventDispatcher()
                 .register(new GuildJoinEventHandler())
-                .register(new MessageReceivedEventHandler());
+                .register(new MessageReceivedEventHandler())
+                .register(new GuildBanEventHandler())
+                .register(new VoiceChannelJoinEvent());
 
         String token = Config.getToken();
 
@@ -46,6 +48,7 @@ public class BotApplication {
 
         CommandRegistry registry = new CommandRegistry();
         registry.register(new RegisterChannelCommand());
+        registry.register(new AutoResponseCommand());
 
         SlashPublisher publisher = new SlashPublisher();
         publisher.publishAll(jda, metaIndex);

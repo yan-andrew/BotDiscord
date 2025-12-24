@@ -17,7 +17,7 @@ public class CommandRouter extends ListenerAdapter {
 
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
-        String slash = event.getName(); // the alias or main name used
+        String slash = event.getName();
         var idOpt = metaIndex.idBySlashName(slash);
         if (idOpt.isEmpty()) {
             event.reply("Unknown command.").setEphemeral(true).queue();

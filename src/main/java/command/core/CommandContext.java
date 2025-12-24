@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 
 public class CommandContext {
     private final SlashCommandInteractionEvent event;
-    private final String invokedName; // slash name actually used (alias or main)
+    private final String invokedName;
 
     public CommandContext(SlashCommandInteractionEvent event, String invokedName) {
         this.event = event;

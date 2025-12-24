@@ -8,42 +8,68 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 
 import java.awt.Color;
 import java.io.File;
+import java.time.OffsetDateTime;
 
-public final class MessageBuilder implements Builder {
+public class MessageBuilder implements Builder{
+
+    private Class<? extends Message> messageType;
     private Message result;
-    private Class<? extends Message> messageType = Message.class;
 
     public void setType(String pType) {
-        try {
-            Class<?> clazz = Class.forName(pType);
-            this.messageType = clazz.asSubclass(Message.class);
-        } catch (ClassNotFoundException e) {
-            throw new IllegalArgumentException("Type message no valid: " + pType, e);
+        if (pType == null) {
+            throw new IllegalArgumentException("Type message no valid: null");
+        }
+
+        switch (pType.trim().toUpperCase()) {
+            case "EMBED":
+                this.messageType = messenger.messaging.Embed.class;
+                break;
+
+            case "ATTACHED":
+                this.messageType = messenger.messaging.Attached.class;
+                break;
+
+            case "MESSAGE":
+                this.messageType = messenger.messaging.Message.class;
+                break;
+
+            default:
+                throw new IllegalArgumentException("Type message no valid: " + pType);
         }
     }
 
-    @Override
     public void reset() {
+        if (this.messageType == null) {
+            throw new IllegalStateException("Message type not set. Call setType() before reset().");
+        }
+
         try {
-            result = messageType.getDeclaredConstructor().newInstance();
+            // Create a fresh instance every time reset is called
+            this.result = this.messageType.getDeclaredConstructor().newInstance();
         } catch (Exception e) {
-            throw new RuntimeException("Error created instance: " + messageType.getName(), e);
+            throw new IllegalStateException("Cannot instantiate message type: " + this.messageType.getName(), e);
         }
     }
 
-    @Override
-    public void buildTitle(String pTitle) {
-        result.setTitle(pTitle);
+    public void buildTitle(String title) {
+        if (result == null) {
+            throw new IllegalStateException("Call reset() before building message fields.");
+        }
+        result.setTitle(title);
     }
 
-    @Override
-    public void buildContent(String pContent) {
-        result.setContent(pContent);
+    public void buildContent(String content) {
+        if (result == null) {
+            throw new IllegalStateException("Call reset() before building message fields.");
+        }
+        result.setContent(content);
     }
 
-    @Override
-    public void buildChannel(MessageChannel pChannel) {
-        result.setChannel(pChannel);
+    public void buildChannel(MessageChannel channel) {
+        if (result == null) {
+            throw new IllegalStateException("Call reset() before building message fields.");
+        }
+        result.setChannel(channel);
     }
 
     @Override
@@ -67,11 +93,34 @@ public final class MessageBuilder implements Builder {
         }
     }
 
-    public Message getResult() {
-        return result;
+    public void buildTimestamp(OffsetDateTime pTime) {
+        if (result instanceof Embed embed) {
+            long epoch = pTime.toEpochSecond();
+
+            String discordTime = "<t:" + epoch + ":F>";
+            String discordRelative = "<t:" + epoch + ":R>";
+
+            embed.setTimestamp("\nDate: " + discordTime + " (" + discordRelative + ")");
+        }
     }
 
-    public void sendBuiltMessage() {
-        result.sendMessage();
+    public void buildThumbnail(String pUrl) {
+        if (result instanceof Embed embed) {
+            embed.setThumbnail(pUrl);
+        }
+    }
+
+    public void buildFooter(String pUrl, String pTag) {
+        if (result instanceof Embed embed) {
+            embed.setFooterTitle(pTag);
+            embed.setFooterIcon(pUrl);
+        }
+    }
+
+    public Message getResult() {
+        if (result == null) {
+            throw new IllegalStateException("Message not built yet. Call reset() and build steps first.");
+        }
+        return result;
     }
 }
