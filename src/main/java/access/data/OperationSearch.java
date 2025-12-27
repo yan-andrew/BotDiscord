@@ -1,6 +1,10 @@
 package access.data;
 
 import access.creational.ConexionDBSingleton;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.Result;
 import org.neo4j.driver.Session;
@@ -32,5 +36,22 @@ public class OperationSearch {
                 return Optional.empty();
             });
         }
+    }
+
+    public static boolean verifyAdministrator(Guild pGuild, long pIdUser) {
+        if (pGuild == null) {
+            return false;
+        }
+
+        Member member = pGuild.getMemberById(pIdUser);
+        if (member == null) {
+            try {
+                member = pGuild.retrieveMemberById(pIdUser).complete();
+            } catch (ErrorResponseException e) {
+                return false;
+            }
+        }
+
+        return member.hasPermission(Permission.ADMINISTRATOR);
     }
 }

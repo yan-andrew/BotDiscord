@@ -2,6 +2,7 @@
 package event.core;
 
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.events.GenericEvent;
@@ -24,13 +25,19 @@ public final class EventDispatcher extends ListenerAdapter {
         // Simple linear dispatch by exact supported type
         for (EventHandler<? extends GenericEvent> h : handlers) {
             if (h.supports().isInstance(event)) {
-                dispatch(h, event);
+                try {
+                    dispatch(h, event);
+                } catch (ExecutionException e) {
+                    throw new RuntimeException(e);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    private void dispatch(EventHandler handler, GenericEvent event) {
+    private void dispatch(EventHandler handler, GenericEvent event) throws ExecutionException, InterruptedException {
         handler.handleEvent(event);
     }
 }

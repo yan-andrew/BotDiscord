@@ -38,7 +38,6 @@ public class CommandRouter extends ListenerAdapter {
         }
 
         try {
-            // pass invokedName to the context
             cmdOpt.get().execute(new CommandContext(event, slash));
         } catch (Exception ex) {
             event.reply("Internal error while executing the command.").setEphemeral(true).queue();

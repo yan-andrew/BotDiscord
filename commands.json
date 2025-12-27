@@ -3,7 +3,7 @@
     "id": "channel.register",
     "name": "channel-register",
     "description": "Register the channels necessary for holding events.",
-    "aliases": ["modslogs-channel", "vcg-channel", "tickets-channel", "advertising-channel", "poll-channel"],
+    "aliases": ["modslogs-channel", "vcg-channel", "tickets-channel", "advertising-channel"],
     "enabled": true,
     "options": [
       {
@@ -32,6 +32,48 @@
         "description": "Reply to message",
         "type": "String",
         "required": false
+      }
+    ]
+  },
+  {
+    "id": "message",
+    "name": "message",
+    "description": "Send an anonymous message with the bot; it will be sent wherever the command is executed.",
+    "aliases": [],
+    "enabled": true,
+    "options": [
+      {
+        "name": "message",
+        "description": "Message you want to send with the bot",
+        "type": "String",
+        "required": true
+      },
+      {
+        "name": "file",
+        "description": "Attach a file to the message.",
+        "type": "ATTACHMENT",
+        "required": false
+      }
+    ]
+  },
+  {
+    "id": "ads",
+    "name": "advertisement",
+    "description": "Send an ad to the announcement channel",
+    "aliases": ["ads", "announcement", "advert", "commercial"],
+    "enabled": true,
+    "options": [
+      {
+        "name": "title",
+        "description": "Ad title.",
+        "type": "String",
+        "required": true
+      },
+      {
+        "name": "content",
+        "description": "Ad content.",
+        "type": "String",
+        "required": true
       }
     ]
   }

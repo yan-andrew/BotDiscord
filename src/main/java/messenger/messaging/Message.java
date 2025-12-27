@@ -24,6 +24,9 @@ public class Message {
     }
 
     protected String buildText() {
+        if (title == null || title.isEmpty()) {
+            return content;
+        }
         return "## " + title + "\n\n" + content;
     }
 

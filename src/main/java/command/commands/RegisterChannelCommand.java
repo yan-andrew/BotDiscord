@@ -1,9 +1,12 @@
 package command.commands;
 
 import access.creational.ConexionDBSingleton;
+import access.data.OperationSearch;
 import command.core.CommandContext;
 import command.core.BotCommand;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.Channel;
+import net.dv8tion.jda.api.events.Event;
 import org.neo4j.driver.Session;
 import org.neo4j.driver.Transaction;
 import org.neo4j.driver.Values;
@@ -16,12 +19,19 @@ public class RegisterChannelCommand implements BotCommand {
 
     @Override
     public void execute(CommandContext pCommandContext) {
-        long guildId;
+        Guild guild;
         String typeRegister, activity, channelId = null;
+        guild = pCommandContext.guild();
+        Event event = pCommandContext.event();
+
+        if (!OperationSearch.verifyAdministrator(guild, pCommandContext.userId())) {
+            pCommandContext.reply("It does not have administrative privileges." , true);
+            return;
+        }
+
 
         Channel channel = pCommandContext.event().getOption("channel").getAsChannel();
 
-        guildId = pCommandContext.guildId();
         channelId = channel.getId();
         typeRegister = pCommandContext.invokedName();
         typeRegister = typeRegister.replaceAll("(?i)\\s*-channel$", "");
@@ -33,7 +43,7 @@ public class RegisterChannelCommand implements BotCommand {
             return;
         }
 
-        activity = registerChannel(channelId, typeRegister, guildId);
+        activity = registerChannel(channelId, typeRegister, guild.getIdLong());
 
         if (activity == null) {
             pCommandContext.reply("Unsupported alias for registration.", true);

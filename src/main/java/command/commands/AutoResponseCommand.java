@@ -1,13 +1,17 @@
 package command.commands;
 
 import access.creational.ConexionDBSingleton;
+import access.data.OperationSearch;
 import command.core.BotCommand;
 import command.core.CommandContext;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.events.Event;
 import org.neo4j.driver.Session;
 import org.neo4j.driver.Transaction;
 import org.neo4j.driver.Values;
 
 import java.time.Instant;
+import java.util.Objects;
 
 public class AutoResponseCommand implements BotCommand {
 
@@ -17,13 +21,18 @@ public class AutoResponseCommand implements BotCommand {
 
     @Override
     public void execute(CommandContext pCommandContext) {
-        long guildId;
+        Guild guild;
         String message, response, actionType, activity = null;
+        guild = pCommandContext.guild();
+        Event event = pCommandContext.event();
 
-        message = String.valueOf(pCommandContext.event().getOption("message"));
-        response = String.valueOf(pCommandContext.event().getOption("response"));
+        if (!OperationSearch.verifyAdministrator(guild, pCommandContext.userId())) {
+            pCommandContext.reply("It does not have administrative privileges." , true);
+            return;
+        }
 
-        guildId = pCommandContext.guildId();
+        message = Objects.requireNonNull(pCommandContext.event().getOption("message")).getAsString();
+
         actionType = pCommandContext.invokedName();
 
         if (actionType.equals("autoresponse")) {
@@ -32,11 +41,12 @@ public class AutoResponseCommand implements BotCommand {
                     "remove an automatic response." , true);
             return;
         } else if (actionType.equals("add-response")) {
-            activity = addResponse(message, response, guildId);
-            activity = "Message: " + activity + " successfully registered with response " + response;
+            response = Objects.requireNonNull(pCommandContext.event().getOption("response")).getAsString();
+            addResponse(message, response, guild.getIdLong());
+            activity = "Message: " + message + " successfully registered with response " + response;
         } else if (actionType.equals("remove-response")) {
-            activity = removeResponse(message, guildId);
-            activity = "The result of deleting message " + message + " was:" + activity;
+            activity = removeResponse(message, guild.getIdLong());
+            activity = "The result of deleting message " + message + " was: " + activity;
         }
 
         if (activity == null) {

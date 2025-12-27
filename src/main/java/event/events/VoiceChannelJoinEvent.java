@@ -12,19 +12,22 @@ import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 
 
 public final class VoiceChannelJoinEvent implements EventHandler<GuildVoiceUpdateEvent> {
-    private static String VCS_SUFFIX = "| VCS";
+    private static final String VCS_SUFFIX = "| VCS";
 
     @Override
     public void handleEvent(GuildVoiceUpdateEvent pEvent) {
         Guild guild = pEvent.getGuild();
         User user = pEvent.getMember().getUser();
+        AudioChannelUnion channelJoin = pEvent.getChannelJoined();
+        AudioChannelUnion channelLeft = pEvent.getChannelLeft();
 
-        if (pEvent.getChannelJoined() != null) {
-            AudioChannelUnion channel = pEvent.getChannelJoined();
-            onJoin(guild, user, channel);
-        } else if (pEvent.getChannelLeft() != null) {
-            AudioChannelUnion channel = pEvent.getChannelLeft();
-            onLeave(guild, user, channel);
+        if (channelJoin != null && channelLeft != null) {
+            onChange(guild, user, channelLeft, channelJoin);
+            return;
+        } else if (channelJoin != null) {
+            onJoin(guild, user, channelJoin);
+        } else if (channelLeft != null) {
+            onLeave(guild, user, channelLeft);
         }
     }
 
@@ -44,8 +47,8 @@ public final class VoiceChannelJoinEvent implements EventHandler<GuildVoiceUpdat
         } else {
             MessageBuilder messageBuilder = new MessageBuilder();
             Director director = new Director(messageBuilder);
-            String content = "User: " + pUser.getAsMention() + " (" + pUser.getId() + ")\n\n" +
-                    "Join: " + channel.getName() + " (" + channel.getAsMention() + ")";
+            String content = "> User: " + pUser.getAsMention() + " (" + pUser.getId() + ")\n" +
+                    "> Join: " + channel.getName() + " (" + channel.getAsMention() + ")";
 
             director.makeJoinVoiceChannel(content, pGuild, pUser);
         }
@@ -65,10 +68,37 @@ public final class VoiceChannelJoinEvent implements EventHandler<GuildVoiceUpdat
 
         MessageBuilder messageBuilder = new MessageBuilder();
         Director director = new Director(messageBuilder);
-        String content = "User: " + pUser.getAsMention() + " (" + pUser.getId() + ")\n\n" +
-                "Leave: " + channel.getName() + " (" + channel.getAsMention() + ")";
+        String content = "> User: " + pUser.getAsMention() + " (" + pUser.getId() + ")\n\n" +
+                "> Leave: " + channel.getName() + " (" + channel.getAsMention() + ")";
 
         director.makeLeaveVoiceChannel(content, pGuild, pUser);
+    }
+
+    private void onChange(Guild pGuild, User pUser, AudioChannelUnion pChannelLeft, AudioChannelUnion pChannelJoin) {
+        String serverId = pGuild.getId();
+        String channelId = pChannelJoin.getId();
+        VoiceChannel channelJoin = pChannelJoin.asVoiceChannel();
+        VoiceChannel channelLeft = pChannelLeft.asVoiceChannel();
+        String VCGId = OperationSearch.findChannelIdForServer(serverId, "vcg").get();
+
+        if (channelLeft.getName().endsWith(VCS_SUFFIX)) {
+            if (channelLeft.getMembers().isEmpty()) {
+                channelLeft.delete().queue();
+                return;
+            }
+        }
+
+        if (channelId.equals(VCGId)) {
+            VCGenerator(pGuild, pUser, channelJoin);
+        } else {MessageBuilder messageBuilder = new MessageBuilder();
+            Director director = new Director(messageBuilder);
+
+            String content = "> User: " + pUser.getAsMention() + " (" + pUser.getId() + ")\n\n" +
+                    "> Move: " + pChannelLeft.getName() + " (" + pChannelLeft.getAsMention() + ") ---> "
+                    + pChannelJoin.getName() + " (" + pChannelJoin.getAsMention() + ")";
+
+            director.makeChangeVoiceChannel(content, pGuild, pUser);
+        }
     }
 
     private void VCGenerator(Guild pGuild, User pUser, VoiceChannel pChannel) {

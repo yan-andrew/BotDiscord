@@ -20,9 +20,9 @@ public class CommandContext {
         return invokedName;
     }
 
-    public long guildId() {
+    public Guild guild() {
         Guild g = event.getGuild();
-        return (g == null) ? 0L : g.getIdLong();
+        return g;
     }
 
     public long channelId() {

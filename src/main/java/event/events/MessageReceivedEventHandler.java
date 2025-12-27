@@ -1,6 +1,7 @@
 // File: events/handlers/MessageReceivedEventHandler.java
 package event.events;
 
+import BotApplication.BotApplication;
 import access.creational.ConexionDBSingleton;
 import messenger.build.Director;
 import messenger.build.MessageBuilder;
@@ -10,13 +11,15 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.neo4j.driver.Session;
 import org.neo4j.driver.Values;
 
+import java.util.concurrent.ExecutionException;
+
 /**
  * Handles new incoming messages.
  */
 public final class MessageReceivedEventHandler implements EventHandler<MessageReceivedEvent> {
 
     @Override
-    public void handleEvent(MessageReceivedEvent pEvent) {
+    public void handleEvent(MessageReceivedEvent pEvent) throws ExecutionException, InterruptedException {
         User author = pEvent.getAuthor();
         Guild guild = pEvent.getGuild();
         if (author.isBot() || author.isSystem()) {
@@ -28,8 +31,10 @@ public final class MessageReceivedEventHandler implements EventHandler<MessageRe
         if (response != null) {
             MessageBuilder messageBuilder = new MessageBuilder();
             Director director = new Director(messageBuilder);
-            director.makeCustom("Response for " + author.getAsMention(), response, pEvent.getChannel());
+            director.makeCustom("Response for " + author.getAsMention(), response, pEvent.getChannel(), null);
         }
+
+        BotApplication.addMessage(pEvent.getMessage());
     }
 
     @Override

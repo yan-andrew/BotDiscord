@@ -5,10 +5,14 @@ import messenger.messaging.Embed;
 import messenger.messaging.Message;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.Message.Attachment;
+import net.dv8tion.jda.api.utils.FileUpload;
 
 import java.awt.Color;
 import java.io.File;
+import java.io.InputStream;
 import java.time.OffsetDateTime;
+import java.util.concurrent.ExecutionException;
 
 public class MessageBuilder implements Builder{
 
@@ -87,9 +91,23 @@ public class MessageBuilder implements Builder{
     }
 
     @Override
+    public void buildFile(Attachment pFile) throws ExecutionException, InterruptedException {
+        if (result instanceof Attached attached) {
+            InputStream inputStream = pFile.getProxy().download().get();
+
+            FileUpload upload = FileUpload.fromData(
+                    inputStream,
+                    pFile.getFileName()
+            );
+            attached.setFile(upload);
+        }
+    }
+
+    @Override
     public void buildFile(File pFile) {
         if (result instanceof Attached attached) {
-            attached.setFile(pFile);
+            FileUpload upload = FileUpload.fromData(pFile, pFile.getName());
+            attached.setFile(upload);
         }
     }
 
@@ -97,10 +115,10 @@ public class MessageBuilder implements Builder{
         if (result instanceof Embed embed) {
             long epoch = pTime.toEpochSecond();
 
-            String discordTime = "<t:" + epoch + ":F>";
+            String discordTime = "<t:" + epoch + ":s>";
             String discordRelative = "<t:" + epoch + ":R>";
 
-            embed.setTimestamp("\nDate: " + discordTime + " (" + discordRelative + ")");
+            embed.setTimestamp("Date: " + discordTime + " (" + discordRelative + ")");
         }
     }
 
