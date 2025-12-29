@@ -1,5 +1,6 @@
 package event.events;
 
+import access.creational.ConexionDBSingleton;
 import messenger.build.Director;
 import messenger.build.MessageBuilder;
 import net.dv8tion.jda.api.audit.ActionType;
@@ -8,6 +9,9 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.events.channel.ChannelDeleteEvent;
+import org.neo4j.driver.Session;
+import org.neo4j.driver.Transaction;
+import org.neo4j.driver.Values;
 
 public final class ChannelDeleteEventHandler implements EventHandler<ChannelDeleteEvent> {
     @Override
@@ -36,6 +40,32 @@ public final class ChannelDeleteEventHandler implements EventHandler<ChannelDele
         } finally {
             channelName = channel.getName();
             channelId = channel.getId();
+
+            String cypher =
+                    "MATCH (s:Server {id: $serverId})-[:USES_CHANNEL]->" +
+                            "(ar:Channel {channelId: $channelId}) " +
+                            "DETACH DELETE ar " +
+                            "RETURN count(ar) AS deleted";
+
+            var conexion = ConexionDBSingleton.getInstance();
+
+            try (Session session = conexion.newSession()) {
+                Transaction transaction = session.beginTransaction();
+                try {
+                    transaction.run(cypher, Values.parameters(
+                                    "serverId", guild.getId(),
+                                    "channelId", channelId)
+                    );
+
+                    transaction.commit();
+
+                } catch (Exception e) {
+                    transaction.rollback();
+                    throw e;
+                } finally {
+                    transaction.close();
+                }
+            }
 
             MessageBuilder messageBuilder = new MessageBuilder();
             Director director = new Director(messageBuilder);

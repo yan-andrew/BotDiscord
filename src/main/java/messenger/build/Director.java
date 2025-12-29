@@ -1,13 +1,15 @@
 package messenger.build;
 
-import messenger.messaging.Attached;
 import messenger.messaging.Message;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.Message.Attachment;
 import access.data.OperationSearch;
+
 import java.util.Random;
 
 import java.awt.*;
@@ -143,8 +145,8 @@ public class Director {
 
         builder.setType("ATTACHED");
         builder.reset();
-        builder.buildTitle("# " + pTitle + " @");
-        builder.buildContent("## " + pContent);
+        builder.buildTitle(pTitle + " @everyone");
+        builder.buildContent(pContent);
         builder.buildChannel(channel);
         builder.buildFile(file);
 
@@ -325,6 +327,56 @@ public class Director {
         builder.buildThumbnail(pUser.getAvatarUrl());
 
         Message result = builder.getResult();
+        result.sendMessage();
+    }
+
+    public void makeView(String pMessage, Guild pGuild, ActionRow pView, Channel pChannel) {
+        builder.setType("embed");
+        builder.reset();
+        builder.buildTitle("Tickets System");
+        builder.buildContent(pMessage);
+        builder.buildFooter(pGuild.getIconUrl(), pGuild.getName());
+        builder.buildChannel((MessageChannel) pChannel);
+        builder.buildView(pView);
+        builder.buildColor(Color.MAGENTA);
+
+        Message result = builder.getResult();
+        result.sendMessage();
+    }
+
+    public void makeTicketLog(String Title, String pMessage, Guild pGuild, File pFile, User pUser) {
+        String idServer = pGuild.getId();
+
+        Optional<String> logChannel = OperationSearch.findChannelIdForServer(idServer, "ticketlogs");
+        String channelId = logChannel.get();
+        String footerText = pUser.getName();
+        String footerIcon = pUser.getAvatarUrl();
+
+        if (channelId.isEmpty()) {
+            return;
+        }
+
+        MessageChannel channel = pGuild.getChannelById(GuildMessageChannel.class, channelId);
+
+        builder.setType("embed");
+        builder.reset();
+        builder.buildTitle(Title);
+        builder.buildContent(pMessage);
+        builder.buildFooter(footerIcon, "Close by: " + footerText);
+        builder.buildChannel(channel);
+        builder.buildColor(Color.MAGENTA);
+
+        Message result = builder.getResult();
+        result.sendMessage();
+
+        builder.setType("ATTACHED");
+        builder.reset();
+        builder.buildTitle("");
+        builder.buildContent("");
+        builder.buildFile(pFile);
+        builder.buildChannel(channel);
+
+        result = builder.getResult();
         result.sendMessage();
     }
 

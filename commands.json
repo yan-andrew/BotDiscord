@@ -3,7 +3,7 @@
     "id": "channel.register",
     "name": "channel-register",
     "description": "Register the channels necessary for holding events.",
-    "aliases": ["modslogs-channel", "vcg-channel", "tickets-channel", "advertising-channel"],
+    "aliases": ["modslogs-channel", "vcg-channel", "tickets-channel", "advertising-channel", "ticketlogs-channel"],
     "enabled": true,
     "options": [
       {
@@ -73,6 +73,75 @@
         "name": "content",
         "description": "Ad content.",
         "type": "String",
+        "required": true
+      }
+    ]
+  },
+  {
+    "id": "addtypeticket",
+    "name": "addtypeticket",
+    "description": "Add a new ticket type to the list.",
+    "aliases": [],
+    "enabled": true,
+    "options": [
+      {
+        "name": "type",
+        "description": "State the name of the type",
+        "type": "String",
+        "required": true
+      },
+      {
+        "name": "description",
+        "description": "Describe the type of ticket",
+        "type": "String",
+        "required": true
+      },
+      {
+        "name": "emoji",
+        "description": "Asocialo to an emoji (No Discord emojis)",
+        "type": "String",
+        "required": true
+      },
+      {
+        "name": "role",
+        "description": "Add the minimum role that will have access (Higher hierarchies will inherit it",
+        "type": "ROLE",
+        "required": false
+      }
+    ]
+  },
+  {
+    "id": "saction",
+    "name": "saction",
+    "description": "Sanction a user for their behavior.",
+    "aliases": ["ban", "kick", "mute"],
+    "enabled": true,
+    "options": [
+      {
+        "name": "user",
+        "description": "User to be sanctioned.",
+        "type": "User",
+        "required": true
+      },
+      {
+        "name": "reason",
+        "description": "Reason for the sanction.",
+        "type": "String",
+        "required": false
+      }
+    ]
+  },
+  {
+    "id": "unsaction",
+    "name": "unsaction",
+    "description": "Sanction a user for their behavior.",
+    "aliases": ["unban", "unmute"],
+    "enabled": true,
+    "options": [
+      {
+        "name": "user",
+        "description": "User to remove a sanction.",
+        "type": "USER",
         "required": true
       }
     ]

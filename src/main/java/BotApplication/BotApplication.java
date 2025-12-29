@@ -15,11 +15,12 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
 import access.secrets.Config;
 import access.creational.ConexionDBSingleton;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
+import systemtickets.listener.TicketCloseListener;
+import systemtickets.listener.TicketSelectListener;
 
 public class BotApplication {
     private static Map<Long, Message> messageCache = new ConcurrentHashMap<>();
@@ -88,11 +89,16 @@ public class BotApplication {
         registry.register(new AutoResponseCommand());
         registry.register(new MessageCommand());
         registry.register(new AdvertisementCommand());
+        registry.register(new AddTypeTicketCommand());
+        registry.register(new SanctionCommand());
+        registry.register(new UnSanctionCommand());
 
         SlashPublisher publisher = new SlashPublisher();
         publisher.publishAll(jda, metaIndex);
 
         jda.addEventListener(new CommandRouter(registry, metaIndex));
+        jda.addEventListener(new TicketSelectListener());
+        jda.addEventListener(new TicketCloseListener());
 
         System.out.println("Discord bot is ready");
     }

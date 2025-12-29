@@ -30,4 +30,12 @@ public class Config {
     public static String getIdDB() {
         return getProperty("ID_DB");
     }
+
+    public static String getNetfily() {
+        return getProperty("NETLIFY_TOKEN");
+    }
+
+    public static String getSite() {
+        return getProperty("SITE_NETLIFY");
+    }
 }

@@ -4,7 +4,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 
 import java.awt.Color;
-import java.time.OffsetDateTime;
+
 
 public final class Embed extends Message {
     private Color color;
@@ -48,10 +48,20 @@ public final class Embed extends Message {
 
         embed.setTitle(title);
         embed.setColor(color);
-        embed.setDescription(content + "\n\n" + time);
+        if (time != null) {
+            embed.setDescription(content + "\n\n" + time);
+        } else {
+            embed.setDescription(content);
+        }
         embed.setFooter(footerTitle, footerIcon);
         embed.setThumbnail(thumbnailUrl);
 
-        channel.sendMessageEmbeds(embed.build()).queue();
+        var action = channel.sendMessageEmbeds(embed.build());
+
+        if (view != null) {
+            action.setComponents(view);
+        }
+
+        action.queue();
     }
 }
